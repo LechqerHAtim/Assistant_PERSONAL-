@@ -20,6 +20,8 @@ import time
 import imaplib
 import email
 import traceback 
+from threading import Thread
+voice_data=str
 ORG_EMAIL = "@gmail.com" 
 FROM_EMAIL = "emailforprojecttest" + ORG_EMAIL 
 FROM_PWD = "test123@" 
@@ -139,8 +141,7 @@ def read_email_from_gmail():
         data = mail.search(None, 'ALL')
         mail_ids = data[1]
         id_list = mail_ids[0].split()   
-        first_email_id = int(id_list[0])
-        latest_email_id = int(id_list[-1])
+
 
         for i in range(1,10):
             data = mail.fetch(str(i), '(RFC822)' )
@@ -245,7 +246,7 @@ def respond(voice_data):
         else:
             speak("my name is lobana. what's your name?")
 
-    if there_exists(["my name is"]):
+    if there_exists(["my name is",'my name']):
         person_name = voice_data.split("is")[-1].strip()
         speak(f"okay, i will remember that {person_name}")
         person_obj.setName(person_name) # remember name in person object
@@ -281,7 +282,7 @@ def respond(voice_data):
         speak(f'Here is what I found for {search_term} on youtube')
 
     # 7: get stock price
-    if there_exists(["price of"]):
+    if there_exists(["price of","price for apple"]):
         search_term = voice_data.lower().split(" of ")[-1].strip() #strip removes whitespace after/before a term in string
         stocks = {
             "apple":"AAPL",
@@ -320,7 +321,7 @@ def respond(voice_data):
     if there_exists(["wikipedia","search in wikipedia","get info wikipedia"]):
        
         try:
-            speak("what do you want to look for in wikipedia Baby")
+            speak("what do you want to look for in wikipedia ")
             voice = record_audio()
             summary=wikipedia.summary(voice)            
             speak(summary)
@@ -332,8 +333,6 @@ def respond(voice_data):
             speak("the email number"+str(email))
             speak(""+str(emails[email]))
 
-    if there_exists(['i love you ','do you love me','love me','do you love me']):
-        speak("i love you honey more than anythings,could you kiss me baby  ")
     if there_exists(['send email']):
         try:
             speak(' what is the message')
@@ -361,6 +360,7 @@ def respond(voice_data):
             "weather": "Example: 'what weather/temperature in Mumbai?'",
             "news": "Example: 'news for today' ",
         }
+        
         ans = """I can do lots of things, for example you can ask me time, date, weather in your city,
         I can open websites for you, launch application and more. See the list of commands-"""
         print(ans)
@@ -378,14 +378,60 @@ def respond(voice_data):
         remember.write(note)
         remember.close
         speak('I have noted that')
+    if there_exists(['what s my contact','contact']):
+        speak('your contact are ')
+        for key in my_dict:
+            speak(key)
+
 
 time.sleep(1)
 person_obj = person()
-i=0
-while(True):
-    takeMedecine()
-    voice_data = record_audio() # get the voice input
-    respond(voice_data) # respond
-    i+=1
+
+
+
+def main():
+    time.sleep(1)
+    global voice_data
+    voice_data=''
+     
+
+    i=0
+    speak("hey im your personal assistant what is your name")
+
+    while True:
+        if voice_data=="stop":
+            break
+        
+        name=record_audio()
+        person.name=name
+
+        if name !='i did not get that':
+            break
+        else:
+            speak('try say your name again')
+    speak('how i can help you today'+person.name)
+
+    while(True): 
+
+        takeMedecine()
+        voice_data = record_audio() # get the voice input
+        respond(voice_data) # respond
+        i+=1
+def interaption_comande():
+    global voice_data
+    
+    while True:
+        voice_data = record_audio() 
+        print('im runing')
+        if voice_data=='stop':
+            print('im done')
+            break
+
+if __name__ == '__main__':
+  
+    Thread(target = main).start()
+    if voice_data=='stop':
+        exit()
+
 
 
